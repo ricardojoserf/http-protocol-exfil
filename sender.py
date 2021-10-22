@@ -4,8 +4,8 @@ import argparse
 import requests
 from http.client import HTTPConnection
 
-send_data_path = "/"
-generate_file_path = "/newfile"
+send_data_path = "/" # it is possible to use any path but it must be the same in listener.py and sender.py
+generate_file_path = "/newfile" # it is possible to use any path but it must be the same in listener.py and sender.py
 
 def get_args():
 	parser = argparse.ArgumentParser()
@@ -21,8 +21,7 @@ def send_bit(url, val_):
 	elif val_ == "1":
 		HTTPConnection._http_vsn_str = "HTTP/1.1"	
 	else:
-		#https://www.youtube.com/watch?v=MOn_ySghN2Y
-		print("https://external-preview.redd.it/srBx_swYIknfTRrPf5gqgE6R3qcNXqeK9LIFuEK9rVQ.jpg?auto=webp&s=f9da8f55a1a108f1fe37df92e52a6064f5ffb9b4")
+		print("What an awful dream! Ones and zeros everywhere... and I thought I saw a 2!")
 		sys.exit()
 	requests.get(url+send_data_path)
 
