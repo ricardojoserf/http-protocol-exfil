@@ -19,8 +19,6 @@ Example:
 python3 listener.py 8080
 ```
 
-![image1](https://raw.githubusercontent.com/ricardojoserf/ricardojoserf.github.io/master/images/http_protocol_exfil/image1.png)
-
 ## Send a file
 
 To send a file use sender.py with two mandatory arguments: the file path and the url of the listener; and one optional argument: the name of the file created remotely (if not used, the name of the input file is used).
@@ -35,7 +33,15 @@ Example:
 python3 sender.py -u "http://127.0.0.1:8080" -i test.txt -o updated_test.txt
 ```
 
-![image2](https://raw.githubusercontent.com/ricardojoserf/ricardojoserf.github.io/master/images/http_protocol_exfil/image1.png)
+---------------------------------------------------------------
+
+First the file is sent:
+
+![image1](https://raw.githubusercontent.com/ricardojoserf/ricardojoserf.github.io/master/images/http_protocol_exfil/image1.png)
+
+If the variable debug is set to True (it is by default) you can see the binary values in the listener log messages:
+
+![image2](https://raw.githubusercontent.com/ricardojoserf/ricardojoserf.github.io/master/images/http_protocol_exfil/image2.png)
 
 The new file is created with the content of the input file:
 
