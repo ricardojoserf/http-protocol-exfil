@@ -35,6 +35,8 @@ python3 sender.py -u "http://127.0.0.1:8080" -i test.txt -o updated_test.txt
 
 ---------------------------------------------------------------
 
+## Example
+
 First the file is sent:
 
 ![image1](https://raw.githubusercontent.com/ricardojoserf/ricardojoserf.github.io/master/images/http_protocol_exfil/image1.png)
