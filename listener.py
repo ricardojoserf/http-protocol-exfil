@@ -57,7 +57,6 @@ class S(BaseHTTPRequestHandler):
                 f.write(file_byte)
                 f.close()
 
-
     def do_POST(self):
         self._set_response()
 
